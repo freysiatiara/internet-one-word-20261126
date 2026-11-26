@@ -39,7 +39,11 @@ def main():
         os.makedirs(parent, exist_ok=True)
     with open(output_path, "w", encoding="utf-8", newline="") as handle:
         handle.write(word)
+        handle.flush()
+        os.fsync(handle.fileno())
     os.chmod(output_path, 0o644)
+    if (os.stat(output_path).st_mode & 0o777) != 0o644:
+        raise SystemExit("output file mode is not 0644")
     with open(output_path, "r", encoding="utf-8") as handle:
         written = handle.read()
     if written != word:
